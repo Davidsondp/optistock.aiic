@@ -31,9 +31,12 @@
         Iniciar sesión
       </button>
 
-      <div class="text-center mt-2">
-        <a href="{{ url_for('recuperar') }}" class="text-sm text-indigo-600 hover:underline">
+      <div class="flex justify-between items-center text-sm mt-3">
+        <a href="{{ url_for('recuperar') }}" class="text-indigo-600 hover:underline">
           ¿Olvidaste tu contraseña?
+        </a>
+        <a href="{{ url_for('auth.registro') }}" class="text-indigo-600 hover:underline">
+          Crear cuenta
         </a>
       </div>
     </form>
@@ -47,5 +50,6 @@
   }
 </script>
 {% endblock %}
+
 
 

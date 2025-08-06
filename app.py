@@ -13,10 +13,11 @@ from sqlalchemy.sql import func
 from dotenv import load_dotenv
 import os
 
-
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "clave_segura")
+db_name = os.getenv("DB_NAME")
+print(db_name)  # Muestra el nombre de la base de datos
 
 # Configuración de sesión y base de datos
 app.config['SESSION_COOKIE_HTTPONLY'] = True

@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_mail import Mail, Message  # Aquí
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature  # Aquí
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Producto, Movimiento
@@ -23,27 +23,23 @@ app.config['SESSION_COOKIE_SECURE'] = not app.debug
 app.config['SESSION_PERMANENT'] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///local.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 # Configuración del correo
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # Tu correo
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # Tu contraseña o App Password
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', app.config['MAIL_USERNAME'])
 
 mail = Mail(app)
-
-# Inicializa el serializador para tokens temporales
 serializer = URLSafeTimedSerializer(app.secret_key)
 
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# Crear tablas automáticamente
 with app.app_context():
     db.create_all()
-
-# Rutas
 
 @app.route("/")
 def index():
@@ -69,7 +65,7 @@ def logout():
     session.clear()
     flash("Sesión cerrada.")
     return redirect(url_for("login"))
-    
+
 @app.route("/recuperar", methods=["GET", "POST"])
 def recuperar():
     if request.method == "POST":
@@ -78,7 +74,6 @@ def recuperar():
         if user:
             token = serializer.dumps(email, salt="recuperar-clave")
             enlace = url_for("restablecer_clave", token=token, _external=True)
-
             try:
                 msg = Message("🔐 Restablecimiento de contraseña",
                               recipients=[email],
@@ -90,11 +85,11 @@ def recuperar():
         else:
             flash("No se encontró una cuenta de administrador con ese correo.", "danger")
     return render_template("recuperar.html")
-    
+
 @app.route("/restablecer/<token>", methods=["GET", "POST"])
 def restablecer_clave(token):
     try:
-        email = serializer.loads(token, salt="recuperar-clave", max_age=900)  # 15 minutos
+        email = serializer.loads(token, salt="recuperar-clave", max_age=900)
     except SignatureExpired:
         flash("El enlace ha expirado.", "danger")
         return redirect(url_for("login"))
@@ -113,11 +108,10 @@ def restablecer_clave(token):
     return render_template("restablecer.html", email=email)
 
 @app.route("/register", methods=["GET", "POST"])
+@app.route("/crear_cuenta", methods=["GET", "POST"])
 def register():
-    # Verificar si ya existe algún admin
     admin_exists = User.query.filter_by(rol="admin").first() is not None
 
-    # Si ya hay admin, aplicar control de acceso
     if admin_exists:
         if "user_id" not in session or session.get("usuario_rol") != "admin":
             flash("Debe iniciar sesión como administrador para registrar usuarios.", "danger")
@@ -127,20 +121,24 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
         rol = request.form.get("rol", "empleado")
+
+        if not admin_exists:
+            rol = "admin"
+
         hashed = generate_password_hash(password)
         user = User(email=email, password=hashed, rol=rol)
+
         try:
             db.session.add(user)
             db.session.commit()
             flash("Usuario registrado con éxito.", "success")
 
-            # Si es el primer admin creado, iniciar sesión automáticamente
-            if not admin_exists and rol == "admin":
+            if not admin_exists:
                 session["user_id"] = user.id
                 session["usuario_rol"] = user.rol
                 return redirect(url_for("dashboard"))
 
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash("Error: El correo ya está en uso.", "danger")
     return render_template("register.html")
@@ -150,7 +148,6 @@ def register():
 @admin_required
 def dashboard():
     consulta = request.args.get("q", "").strip()
-
     if consulta:
         productos = Producto.query.filter(Producto.nombre.ilike(f"%{consulta}%")).all()
     else:
@@ -340,6 +337,7 @@ def server_error(e):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 

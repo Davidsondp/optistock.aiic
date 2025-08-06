@@ -1,0 +1,10 @@
+Flask>=2.2
+Flask-SQLAlchemy>=3.0
+Flask-Migrate>=4.0
+Flask-Mail>=0.9.1
+psycopg2-binary>=2.9
+Werkzeug>=2.2
+gunicorn>=20.1
+python-dotenv>=1.0
+openai>=1.0.0
+itsdangerous>=2.1  # Para tokens seguros de recuperación de contraseña

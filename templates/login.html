@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+  <div class="bg-white shadow-xl rounded-xl w-full max-w-md p-8 space-y-6">
+
+    <div class="flex flex-col items-center">
+      <img src="{{ url_for('static', filename='logo.jpeg') }}" class="w-20 h-20 rounded-full shadow mb-2" alt="Logo">
+      <h1 class="text-2xl font-bold text-gray-700">Iniciar Sesión</h1>
+    </div>
+
+    <form method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Correo</label>
+        <input type="email" name="email" required class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Contraseña</label>
+        <div class="relative">
+          <input type="password" id="password" name="password" required
+                 class="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <button type="button" onclick="togglePassword()" class="absolute right-2 top-2 text-sm text-gray-500">
+            👁
+          </button>
+        </div>
+      </div>
+
+      <button type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded transition">
+        Iniciar sesión
+      </button>
+
+      <div class="text-center mt-2">
+        <a href="{{ url_for('recuperar_password') }}" class="text-sm text-indigo-600 hover:underline">
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function togglePassword() {
+    const campo = document.getElementById('password');
+    campo.type = campo.type === 'password' ? 'text' : 'password';
+  }
+</script>
+{% endblock %}
+
+
+</div>
+{% endblock %}
+
+
+

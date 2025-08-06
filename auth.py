@@ -8,7 +8,7 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
             flash("Debes iniciar sesión para continuar.", "warning")
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))  # Cambio aquí
         return f(*args, **kwargs)
     return decorated_function
 
@@ -18,16 +18,16 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
             flash("Debes iniciar sesión para continuar.", "warning")
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))  # Cambio aquí
 
         user = User.query.get(session["user_id"])
         if not user:
             flash("Usuario no encontrado.", "danger")
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))  # Cambio aquí
 
         if user.rol != "admin":
             flash("Acceso restringido solo para administradores.", "danger")
-            return redirect(url_for("movimientos"))
+            return redirect(url_for("movimientos"))  # Cambia por "main.movimientos" si es blueprint
 
         return f(*args, **kwargs)
     return decorated_function
@@ -38,17 +38,18 @@ def empleado_o_admin_required(f):
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
             flash("Debes iniciar sesión para continuar.", "warning")
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))  # Cambio aquí
 
         user = User.query.get(session["user_id"])
         if not user:
             flash("Usuario no encontrado.", "danger")
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))  # Cambio aquí
 
         if user.rol not in ("empleado", "admin"):
             flash("Acceso restringido solo para empleados o administradores.", "danger")
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))  # Cambio aquí
 
         return f(*args, **kwargs)
     return decorated_function
+
 

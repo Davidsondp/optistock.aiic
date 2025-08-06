@@ -13,9 +13,8 @@ from sqlalchemy.sql import func
 from dotenv import load_dotenv
 import os
 
-# Cargar variables de entorno
-load_dotenv()
 
+load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "clave_segura")
 

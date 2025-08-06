@@ -1,0 +1,20 @@
+# Ignorar entorno virtual
+venv/
+
+# Configuración privada
+.env
+.env.*
+
+# Archivos compilados
+*.pyc
+__pycache__/
+
+# Archivos de base de datos y logs
+*.sqlite3
+*.log
+
+# Archivos de sistema
+.DS_Store
+
+# Archivos de instancia Flask
+instance/

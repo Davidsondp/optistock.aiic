@@ -1,1 +1,19 @@
-
+# .github/workflows/ci-cd.yml
+name: Despliegue NexuStock
+on: [push]
+jobs:
+  desplegar:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configurar Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+      - run: pip install -r backend/requirements.txt
+      - run: pytest pruebas/ --cov=backend/ --cov-report=xml
+      - name: Desplegar en Render
+        uses: render-actions/deploy@v1
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
